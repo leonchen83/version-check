@@ -17,9 +17,9 @@ object VersionCheck {
               if (x.rc.isEmpty && y.rc.isEmpty) {
                 1
               } else if (x.rc.isEmpty) {
-                -1
-              } else if (y.rc.isEmpty) {
                 1
+              } else if (y.rc.isEmpty) {
+                -1
               } else {
                 x.rc.get.compareTo(y.rc.get)
               }
