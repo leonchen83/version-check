@@ -6,7 +6,7 @@ package version
 object VersionCheck {
 
   def latest(vers: Seq[String]): String = {
-    vers.maxBy(parseVersion(_))(new Ordering[Version] {
+    vers.maxBy(parseVersion)(new Ordering[Version] {
       override def compare(x: Version, y: Version): Int = {
         implicitly[Ordering[(Int, Int, Int, Int)]].compare(x.tuple, y.tuple)
       }
@@ -84,5 +84,5 @@ object VersionCheck {
 }
 
 case class Version(v1: Int, v2: Int, v3: Int = 0, rc: Int = Int.MaxValue) {
-  def tuple: (Int, Int, Int, Int) = (v1, v2, v3, rc)
+  def tuple = (v1, v2, v3, rc)
 }
