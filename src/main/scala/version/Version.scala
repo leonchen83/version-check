@@ -6,11 +6,11 @@ package version
 object VersionCheck {
 
   def latest(vers: Seq[String]): String = {
-    vers.map(parseVersion).max(new Ordering[Version] {
+    vers.maxBy(parseVersion(_))(new Ordering[Version] {
       override def compare(x: Version, y: Version): Int = {
         implicitly[Ordering[(Int, Int, Int, Int)]].compare(x.tuple, y.tuple)
       }
-    }).ori
+    })
   }
 
   private[this] def parseVersion(ver: String): Version = {
@@ -27,13 +27,13 @@ object VersionCheck {
       next = it.next()
       num = parseNum(next, it)
       v2 = num._1
-      next = num._2.getOrElse(return Version(ver, v1, v2))
+      next = num._2.getOrElse(return Version(v1, v2))
     }
     if (next == '.') {
       next = it.next()
       num = parseNum(next, it)
       v3 = num._1
-      next = num._2.getOrElse(return Version(ver, v1, v2, v3))
+      next = num._2.getOrElse(return Version(v1, v2, v3))
     }
     if (next == '-') {
       next = it.next()
@@ -44,7 +44,7 @@ object VersionCheck {
           next = it.next()
           num = parseNum(next, it)
           rc = num._1
-          next = num._2.getOrElse(return Version(ver, v1, v2, v3, rc))
+          next = num._2.getOrElse(return Version(v1, v2, v3, rc))
         }
       }
     }
@@ -83,6 +83,6 @@ object VersionCheck {
   }
 }
 
-case class Version(ori: String, v1: Int, v2: Int, v3: Int = 0, rc: Int = Int.MaxValue) {
+case class Version(v1: Int, v2: Int, v3: Int = 0, rc: Int = Int.MaxValue) {
   def tuple: (Int, Int, Int, Int) = (v1, v2, v3, rc)
 }
