@@ -20,12 +20,7 @@ class TestVersion extends FlatSpec {
     assert(latest(List("0.0.6", "0.0.7", "0.0.7-RC2")) == "0.0.7")
   }
 
-  """"000.000.006", "0.0.7", "0.0.7-RC2"""" should "error" in {
-    try {
-      latest(List("000.000.006", "0.0.7", "0.0.7-RC2"))
-      fail()
-    } catch {
-      case e: Throwable => // pass
-    }
+  """"0.6.0", "0.6-RC1", "0.6"""" should "0.6" in {
+    assert(latest(List("0.6.0", "0.6-RC1", "0.6")) == "0.6.0")
   }
 }
