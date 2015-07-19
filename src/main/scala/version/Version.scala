@@ -8,7 +8,7 @@ object VersionCheck {
   def latest(vers: Seq[String]): String = {
     vers.map(parseVersion).max(new Ordering[Version] {
       override def compare(x: Version, y: Version): Int = {
-        x.list.zip(y.list).map(e => e._1 - e._2).find(_ != 0).getOrElse(0)
+        implicitly[Ordering[(Int,Int,Int,Int)]].compare(x.tuple, y.tuple)
       }
     }).ori
   }
@@ -83,5 +83,5 @@ object VersionCheck {
 }
 
 case class Version(ori: String, v1: Int, v2: Int, v3: Int = 0, rc: Int = Int.MaxValue) {
-  def list: List[Int] = List(v1, v2, v3, rc)
+  def tuple: (Int,Int,Int,Int) = (v1, v2, v3, rc)
 }
