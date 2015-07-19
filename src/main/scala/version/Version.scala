@@ -13,7 +13,7 @@ object VersionCheck {
     }).ori
   }
 
-  def parseVersion(ver: String): Version = {
+  private[this] def parseVersion(ver: String): Version = {
     val it: Iterator[Char] = ver.iterator
     var next = it.next()
     var num = parseNum(next, it)
@@ -51,7 +51,7 @@ object VersionCheck {
     throw new Exception("parse error")
   }
 
-  def parseNum(ch: Char, it: Iterator[Char]): (Int, Option[Char]) = {
+  private[this] def parseNum(ch: Char, it: Iterator[Char]): (Int, Option[Char]) = {
     var next = ch
     val sb = new StringBuilder
     next match {
