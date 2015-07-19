@@ -8,53 +8,32 @@ object VersionCheck {
   def latest(vers: Seq[String]): String = {
     vers.map(parseVersion).max(new Ordering[Version] {
       override def compare(x: Version, y: Version): Int = {
-        val c1 = x.v1.compareTo(y.v1)
-        if (c1 == 0) {
-          val c2 = x.v2.compareTo(y.v2)
-          if (c2 == 0) {
-            val c3 = x.v3.compareTo(y.v3)
-            if (c3 == 0) {
-              if (x.rc.isEmpty && y.rc.isEmpty) {
-                1
-              } else if (x.rc.isEmpty) {
-                -1
-              } else if (y.rc.isEmpty) {
-                1
-              } else {
-                x.rc.get.compareTo(y.rc.get)
-              }
-            } else {
-              c3
-            }
-          } else {
-            c2
-          }
-        } else {
-          c1
-        }
+        x.list.zip(y.list).map(e => e._1 - e._2).find(_ != 0).getOrElse(0)
       }
     }).ori
   }
 
   def parseVersion(ver: String): Version = {
-    val rs = new Version()
-    rs.ori = ver
     val it: Iterator[Char] = ver.iterator
     var next = it.next()
     var num = parseNum(next, it)
-    rs.v1 = num._1
+    val v1: Int = num._1
+    var v2: Int = 0
+    var v3: Int = 0
+    //compare tricky
+    var rc: Int = Int.MaxValue
     next = num._2.get
     if (next == '.') {
       next = it.next()
       num = parseNum(next, it)
-      rs.v2 = num._1
-      next = num._2.getOrElse(return rs)
+      v2 = num._1
+      next = num._2.getOrElse(return Version(ver, v1, v2))
     }
     if (next == '.') {
       next = it.next()
       num = parseNum(next, it)
-      rs.v3 = num._1
-      next = num._2.getOrElse(return rs)
+      v3 = num._1
+      next = num._2.getOrElse(return Version(ver, v1, v2, v3))
     }
     if (next == '-') {
       next = it.next()
@@ -63,8 +42,8 @@ object VersionCheck {
         if (next == 'C') {
           next = it.next()
           num = parseNum(next, it)
-          rs.rc = Some(num._1)
-          next = num._2.getOrElse(return rs)
+          rc = num._1
+          next = num._2.getOrElse(return Version(ver, v1, v2, v3, rc))
         }
       }
     }
@@ -76,6 +55,7 @@ object VersionCheck {
     val sb = new StringBuilder
     next match {
       case '0' =>
+        //avoid leading zeros
         sb.append(next)
         if (it.hasNext) {
           next = it.next()
@@ -102,12 +82,6 @@ object VersionCheck {
   }
 }
 
-class Version {
-  var v1: Int = _
-  var v2: Int = _
-  var v3: Int = 0
-  var ori: String = _
-  var rc: Option[Int] = None
-
-  override def toString = s"Version(v1=$v1, v2=$v2, v3=$v3, ori=$ori, rc=$rc)"
+case class Version(ori: String, v1: Int, v2: Int, v3: Int = 0, rc: Int = Int.MaxValue) {
+  def list: List[Int] = List(v1, v2, v3, rc)
 }
